@@ -39,8 +39,6 @@ class Settings(BaseSettings):
     # ==========================================================================
     # Social Media APIs
     # ==========================================================================
-    tiktok_client_key: str = Field(default="", description="TikTok Client Key")
-    tiktok_client_secret: str = Field(default="", description="TikTok Client Secret")
     instagram_access_token: str = Field(default="", description="Instagram Access Token")
     instagram_business_account_id: str = Field(default="", description="Instagram Business ID")
     youtube_client_id: str = Field(default="", description="YouTube Client ID")

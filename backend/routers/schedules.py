@@ -26,12 +26,11 @@ class CreateScheduleRequest(BaseModel):
     title: str = Field(..., description="Post title")
     description: str = Field(..., description="Post description")
     scheduled_time: datetime = Field(..., description="When to post (ISO format)")
-    platforms: List[str] = Field(..., description="Platforms: tiktok, instagram, youtube")
+    platforms: List[str] = Field(..., description="Platforms: instagram, youtube")
     hashtags: List[str] = Field(default=[], description="List of hashtags")
     timezone: str = Field(default="UTC", description="User timezone")
     
     # Platform-specific settings
-    tiktok_settings: dict = Field(default={})
     instagram_settings: dict = Field(default={})
     youtube_settings: dict = Field(default={})
 
@@ -107,7 +106,6 @@ async def create_schedule(request: CreateScheduleRequest):
         platforms=platforms,
         hashtags=request.hashtags,
         timezone=request.timezone,
-        tiktok=request.tiktok_settings,
         instagram=request.instagram_settings,
         youtube=request.youtube_settings
     )

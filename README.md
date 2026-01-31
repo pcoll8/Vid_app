@@ -2,7 +2,7 @@
 
 **AI-Powered Viral Content Automation Platform**
 
-Transform long-form YouTube videos or local files into short, viral-potential clips optimized for Instagram Reels, TikTok, and YouTube Shorts.
+Transform long-form YouTube videos or local files into short, viral-potential clips optimized for Instagram Reels and YouTube Shorts.
 
 ![Python](https://img.shields.io/badge/Python-3.10+-blue.svg)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-green.svg)
@@ -25,13 +25,13 @@ Transform long-form YouTube videos or local files into short, viral-potential cl
 - **Speaker Identification** - Automatically focuses on the active speaker
 
 ### 🎬 Video Rendering
-- **9:16 Vertical Format** - Optimized for Reels, Shorts, and TikTok
+- **9:16 Vertical Format** - Optimized for Reels and Shorts
 - **Blurred Background** - Professional aesthetic for GENERAL mode clips
 - **Subtitle Overlay** - Burned-in captions for accessibility
 
 ### ☁️ Cloud & Distribution
 - **AWS S3 Backup** - Automatic silent uploads with multipart support
-- **Social Media Posting** - Direct publishing to TikTok, Instagram, and YouTube
+- **Social Media Posting** - Direct publishing to Instagram and YouTube
 - **Multi-Account Support** - Manage multiple social media profiles
 
 ### 🎙️ AI Voice Dubbing
@@ -118,7 +118,6 @@ Copy `.env.example` to `.env` and configure the following:
 | `AWS_SECRET_ACCESS_KEY` | S3 backup secret key | AWS Console |
 | `S3_BUCKET_NAME` | S3 bucket name | AWS Console |
 | `ELEVENLABS_API_KEY` | Voice dubbing | [ElevenLabs](https://elevenlabs.io/) |
-| `TIKTOK_CLIENT_KEY` | TikTok posting | [TikTok Developers](https://developers.tiktok.com/) |
 | `INSTAGRAM_ACCESS_TOKEN` | Instagram posting | [Meta for Developers](https://developers.facebook.com/) |
 | `YOUTUBE_CLIENT_ID` | YouTube posting | [Google Cloud Console](https://console.cloud.google.com/) |
 

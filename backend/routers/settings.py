@@ -61,11 +61,6 @@ async def get_current_settings():
             status="Ready" if settings.elevenlabs_api_key else "API key required"
         ),
         ServiceStatus(
-            name="TikTok",
-            configured=bool(settings.tiktok_client_key),
-            status="Ready" if settings.tiktok_client_key else "Not configured"
-        ),
-        ServiceStatus(
             name="Instagram",
             configured=bool(settings.instagram_access_token),
             status="Ready" if settings.instagram_access_token else "Not configured"

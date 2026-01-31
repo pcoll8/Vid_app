@@ -1,15 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ViralClip - Viral Content Automation</title>
-    <meta name="description" content="Transform long videos into viral short clips optimized for Instagram Reels, TikTok, and YouTube Shorts">
+    <meta name="description"
+        content="Transform long videos into viral short clips optimized for Instagram Reels and YouTube Shorts">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/css/style.css">
 </head>
+
 <body>
     <!-- Animated Background -->
     <div class="bg-animation">
@@ -49,7 +52,7 @@
                     <span class="icon">🎬</span>
                     Create Viral Clips
                 </h2>
-                
+
                 <form id="jobForm" class="job-form">
                     <!-- Source Input -->
                     <div class="input-group">
@@ -62,13 +65,12 @@
                                 <span class="icon">📁</span> Upload File
                             </button>
                         </div>
-                        
+
                         <div class="tab-content active" id="url-tab">
-                            <input type="url" id="sourceUrl" class="input-field" 
-                                   placeholder="https://www.youtube.com/watch?v=..."
-                                   autocomplete="off">
+                            <input type="url" id="sourceUrl" class="input-field"
+                                placeholder="https://www.youtube.com/watch?v=..." autocomplete="off">
                         </div>
-                        
+
                         <div class="tab-content" id="file-tab">
                             <div class="file-upload" id="fileUpload">
                                 <input type="file" id="sourceFile" accept="video/*" hidden>
@@ -90,20 +92,17 @@
                     <div class="options-grid">
                         <div class="input-group">
                             <label class="input-label">Number of Clips</label>
-                            <input type="number" id="clipCount" class="input-field" 
-                                   value="5" min="1" max="15">
+                            <input type="number" id="clipCount" class="input-field" value="5" min="1" max="15">
                         </div>
-                        
+
                         <div class="input-group">
                             <label class="input-label">Min Duration (sec)</label>
-                            <input type="number" id="minDuration" class="input-field" 
-                                   value="15" min="5" max="30">
+                            <input type="number" id="minDuration" class="input-field" value="15" min="5" max="30">
                         </div>
-                        
+
                         <div class="input-group">
                             <label class="input-label">Max Duration (sec)</label>
-                            <input type="number" id="maxDuration" class="input-field" 
-                                   value="60" min="30" max="180">
+                            <input type="number" id="maxDuration" class="input-field" value="60" min="30" max="180">
                         </div>
                     </div>
 
@@ -121,7 +120,7 @@
                                     Upload clips to S3 for backup
                                 </label>
                             </div>
-                            
+
                             <div class="checkbox-group">
                                 <label class="checkbox-label">
                                     <input type="checkbox" id="enableDubbing">
@@ -129,7 +128,7 @@
                                     Enable AI Voice Dubbing
                                 </label>
                             </div>
-                            
+
                             <div class="input-group dubbing-options" id="dubbingOptions" hidden>
                                 <label class="input-label">Target Language</label>
                                 <select id="dubbingLanguage" class="input-field">
@@ -170,16 +169,16 @@
                     <span class="icon">⚡</span>
                     Processing
                 </h2>
-                
+
                 <div class="progress-header">
                     <span class="progress-status" id="progressStatus">Initializing...</span>
                     <span class="progress-percent" id="progressPercent">0%</span>
                 </div>
-                
+
                 <div class="progress-bar-container">
                     <div class="progress-bar" id="progressBar"></div>
                 </div>
-                
+
                 <div class="progress-steps" id="progressSteps">
                     <div class="step" data-step="download">
                         <span class="step-icon">📥</span>
@@ -213,7 +212,7 @@
                     </h2>
                     <span class="clip-count" id="clipCountBadge">0 clips</span>
                 </div>
-                
+
                 <div class="clips-grid" id="clipsGrid">
                     <!-- Clips will be dynamically added here -->
                 </div>
@@ -230,7 +229,7 @@
                         Clear
                     </button>
                 </div>
-                
+
                 <div class="log-viewer" id="logViewer">
                     <div class="log-entry info">
                         <span class="log-time">--:--:--</span>
@@ -261,7 +260,7 @@
                         <!-- Services will be loaded dynamically -->
                     </div>
                 </div>
-                
+
                 <div class="settings-section">
                     <h3>System Status</h3>
                     <div class="system-stats" id="systemStats">
@@ -315,4 +314,5 @@
 
     <script src="/static/js/app.js"></script>
 </body>
+
 </html>

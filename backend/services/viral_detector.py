@@ -145,7 +145,7 @@ class ViralDetector:
         total_duration: float
     ) -> str:
         """Build the prompt for Gemini analysis"""
-        return f"""You are an expert viral content analyst specializing in short-form video content for TikTok, Instagram Reels, and YouTube Shorts.
+        return f"""You are an expert viral content analyst specializing in short-form video content for Instagram Reels and YouTube Shorts.
 
 Analyze this video transcript and identify the {clip_count} most viral-worthy moments that would perform best as standalone short clips.
 

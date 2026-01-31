@@ -1,6 +1,6 @@
 """
 Social Media Posting Service
-Direct posting to TikTok, Instagram, and YouTube
+Direct posting to Instagram and YouTube
 """
 
 import asyncio
@@ -17,7 +17,6 @@ logger = get_logger()
 
 class Platform(str, Enum):
     """Supported social media platforms"""
-    TIKTOK = "tiktok"
     INSTAGRAM = "instagram"
     YOUTUBE = "youtube"
 
@@ -62,61 +61,6 @@ class SocialPoster:
         if platform:
             profiles = [p for p in profiles if p.platform == platform]
         return profiles
-    
-    async def post_to_tiktok(
-        self,
-        video_path: str,
-        title: str,
-        description: str,
-        hashtags: List[str] = None,
-        progress_callback: Optional[Callable[[float, str], None]] = None
-    ) -> PostResult:
-        """
-        Post video to TikTok
-        
-        Note: TikTok Content Posting API has limited availability.
-        This implementation provides the structure for when access is granted.
-        """
-        logger.info(f"Posting to TikTok: {title}")
-        
-        if not self.settings.tiktok_client_key:
-            return PostResult(
-                platform=Platform.TIKTOK,
-                success=False,
-                error_message="TikTok API not configured"
-            )
-        
-        if progress_callback:
-            progress_callback(0, "Preparing TikTok upload...")
-        
-        try:
-            # TikTok Content Posting API flow:
-            # 1. Initialize upload
-            # 2. Upload video chunks
-            # 3. Publish with metadata
-            
-            # Placeholder for actual TikTok API integration
-            # The API requires special access approval from TikTok
-            
-            if progress_callback:
-                progress_callback(50, "TikTok API integration pending...")
-            
-            # For now, return a placeholder result
-            logger.warning("TikTok posting requires API access approval")
-            
-            return PostResult(
-                platform=Platform.TIKTOK,
-                success=False,
-                error_message="TikTok Content Posting API access required. Visit developers.tiktok.com"
-            )
-            
-        except Exception as e:
-            logger.error(f"TikTok post failed: {e}")
-            return PostResult(
-                platform=Platform.TIKTOK,
-                success=False,
-                error_message=str(e)
-            )
     
     async def post_to_instagram(
         self,
@@ -276,7 +220,7 @@ class SocialPoster:
             List of PostResult for each platform
         """
         if platforms is None:
-            platforms = [Platform.TIKTOK, Platform.INSTAGRAM, Platform.YOUTUBE]
+            platforms = [Platform.INSTAGRAM, Platform.YOUTUBE]
         
         results = []
         total = len(platforms)
@@ -286,11 +230,7 @@ class SocialPoster:
                 ((i + p / 100) / total) * 100, f"[{platform.value}] {m}"
             ) if progress_callback else None
             
-            if platform == Platform.TIKTOK:
-                result = await self.post_to_tiktok(
-                    video_path, title, description, hashtags, platform_progress
-                )
-            elif platform == Platform.INSTAGRAM:
+            if platform == Platform.INSTAGRAM:
                 caption = f"{title}\n\n{description}"
                 result = await self.post_to_instagram(
                     video_path, caption, hashtags, platform_progress

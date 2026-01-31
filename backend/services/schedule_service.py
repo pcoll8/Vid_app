@@ -106,7 +106,6 @@ class ScheduleService:
             platforms=platforms,
             hashtags=hashtags or [],
             timezone=timezone,
-            tiktok_settings=platform_settings.get("tiktok", {}),
             instagram_settings=platform_settings.get("instagram", {}),
             youtube_settings=platform_settings.get("youtube", {})
         )

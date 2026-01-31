@@ -24,7 +24,7 @@ social_poster = SocialPoster()
 
 class SocialPostRequest(BaseModel):
     """Request to post a clip to social media"""
-    platforms: List[str]  # ["tiktok", "instagram", "youtube"]
+    platforms: List[str]  # ["instagram", "youtube"]
     custom_title: Optional[str] = None
     custom_description: Optional[str] = None
     custom_hashtags: Optional[List[str]] = None

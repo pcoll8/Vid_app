@@ -22,7 +22,6 @@ class ScheduleStatus(str, Enum):
 
 class Platform(str, Enum):
     """Supported social media platforms"""
-    TIKTOK = "tiktok"
     INSTAGRAM = "instagram"
     YOUTUBE = "youtube"
 
@@ -49,7 +48,6 @@ class ScheduledPost:
     hashtags: List[str] = field(default_factory=list)
     
     # Platform-specific settings
-    tiktok_settings: Dict[str, Any] = field(default_factory=dict)
     instagram_settings: Dict[str, Any] = field(default_factory=dict)
     youtube_settings: Dict[str, Any] = field(default_factory=dict)
     
@@ -102,7 +100,6 @@ class ScheduledPost:
             title=data.get("title", ""),
             description=data.get("description", ""),
             hashtags=data.get("hashtags", []),
-            tiktok_settings=data.get("tiktok_settings", {}),
             instagram_settings=data.get("instagram_settings", {}),
             youtube_settings=data.get("youtube_settings", {}),
             status=ScheduleStatus(data.get("status", "pending")),
