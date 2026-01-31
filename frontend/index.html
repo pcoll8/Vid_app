@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ViralClip - Viral Content Automation</title>
+    <meta name="description" content="Transform long videos into viral short clips optimized for Instagram Reels, TikTok, and YouTube Shorts">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="bg-animation">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <div class="logo-icon">⚡</div>
+                <div class="logo-text">
+                    <h1>ViralClip</h1>
+                    <span class="tagline">AI-Powered Viral Content Factory</span>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-ghost" id="settingsBtn">
+                    <span class="icon">⚙️</span>
+                    Settings
+                </button>
+                <div class="status-indicator" id="connectionStatus">
+                    <span class="status-dot"></span>
+                    <span class="status-text">Connecting...</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Input Section -->
+            <section class="glass-card input-section">
+                <h2 class="section-title">
+                    <span class="icon">🎬</span>
+                    Create Viral Clips
+                </h2>
+                
+                <form id="jobForm" class="job-form">
+                    <!-- Source Input -->
+                    <div class="input-group">
+                        <label class="input-label">Video Source</label>
+                        <div class="source-tabs">
+                            <button type="button" class="tab-btn active" data-tab="url">
+                                <span class="icon">🔗</span> YouTube URL
+                            </button>
+                            <button type="button" class="tab-btn" data-tab="file">
+                                <span class="icon">📁</span> Upload File
+                            </button>
+                        </div>
+                        
+                        <div class="tab-content active" id="url-tab">
+                            <input type="url" id="sourceUrl" class="input-field" 
+                                   placeholder="https://www.youtube.com/watch?v=..."
+                                   autocomplete="off">
+                        </div>
+                        
+                        <div class="tab-content" id="file-tab">
+                            <div class="file-upload" id="fileUpload">
+                                <input type="file" id="sourceFile" accept="video/*" hidden>
+                                <div class="upload-content">
+                                    <span class="upload-icon">📤</span>
+                                    <p>Drag & drop your video here</p>
+                                    <span class="upload-hint">or click to browse</span>
+                                </div>
+                                <div class="file-preview" id="filePreview" hidden>
+                                    <span class="file-icon">🎥</span>
+                                    <span class="file-name"></span>
+                                    <button type="button" class="remove-file">✕</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Options Grid -->
+                    <div class="options-grid">
+                        <div class="input-group">
+                            <label class="input-label">Number of Clips</label>
+                            <input type="number" id="clipCount" class="input-field" 
+                                   value="5" min="1" max="15">
+                        </div>
+                        
+                        <div class="input-group">
+                            <label class="input-label">Min Duration (sec)</label>
+                            <input type="number" id="minDuration" class="input-field" 
+                                   value="15" min="5" max="30">
+                        </div>
+                        
+                        <div class="input-group">
+                            <label class="input-label">Max Duration (sec)</label>
+                            <input type="number" id="maxDuration" class="input-field" 
+                                   value="60" min="30" max="180">
+                        </div>
+                    </div>
+
+                    <!-- Advanced Options -->
+                    <details class="advanced-options">
+                        <summary>
+                            <span class="icon">🔧</span>
+                            Advanced Options
+                        </summary>
+                        <div class="advanced-content">
+                            <div class="checkbox-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="uploadToS3" checked>
+                                    <span class="checkmark"></span>
+                                    Upload clips to S3 for backup
+                                </label>
+                            </div>
+                            
+                            <div class="checkbox-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="enableDubbing">
+                                    <span class="checkmark"></span>
+                                    Enable AI Voice Dubbing
+                                </label>
+                            </div>
+                            
+                            <div class="input-group dubbing-options" id="dubbingOptions" hidden>
+                                <label class="input-label">Target Language</label>
+                                <select id="dubbingLanguage" class="input-field">
+                                    <option value="">Select language...</option>
+                                    <option value="es">Spanish</option>
+                                    <option value="fr">French</option>
+                                    <option value="de">German</option>
+                                    <option value="pt">Portuguese</option>
+                                    <option value="it">Italian</option>
+                                    <option value="ja">Japanese</option>
+                                    <option value="ko">Korean</option>
+                                    <option value="zh">Chinese</option>
+                                    <option value="ar">Arabic</option>
+                                    <option value="hi">Hindi</option>
+                                    <option value="ru">Russian</option>
+                                </select>
+                            </div>
+                        </div>
+                    </details>
+
+                    <!-- Submit Button -->
+                    <button type="submit" class="btn btn-primary btn-large" id="submitBtn">
+                        <span class="btn-content">
+                            <span class="icon">🚀</span>
+                            Generate Viral Clips
+                        </span>
+                        <span class="btn-loading" hidden>
+                            <span class="spinner"></span>
+                            Processing...
+                        </span>
+                    </button>
+                </form>
+            </section>
+
+            <!-- Progress Section -->
+            <section class="glass-card progress-section" id="progressSection" hidden>
+                <h2 class="section-title">
+                    <span class="icon">⚡</span>
+                    Processing
+                </h2>
+                
+                <div class="progress-header">
+                    <span class="progress-status" id="progressStatus">Initializing...</span>
+                    <span class="progress-percent" id="progressPercent">0%</span>
+                </div>
+                
+                <div class="progress-bar-container">
+                    <div class="progress-bar" id="progressBar"></div>
+                </div>
+                
+                <div class="progress-steps" id="progressSteps">
+                    <div class="step" data-step="download">
+                        <span class="step-icon">📥</span>
+                        <span class="step-label">Download</span>
+                    </div>
+                    <div class="step" data-step="transcribe">
+                        <span class="step-icon">📝</span>
+                        <span class="step-label">Transcribe</span>
+                    </div>
+                    <div class="step" data-step="analyze">
+                        <span class="step-icon">🧠</span>
+                        <span class="step-label">Analyze</span>
+                    </div>
+                    <div class="step" data-step="crop">
+                        <span class="step-icon">✂️</span>
+                        <span class="step-label">Crop</span>
+                    </div>
+                    <div class="step" data-step="render">
+                        <span class="step-icon">🎨</span>
+                        <span class="step-label">Render</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Clips Gallery -->
+            <section class="glass-card clips-section" id="clipsSection" hidden>
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <span class="icon">🎯</span>
+                        Generated Clips
+                    </h2>
+                    <span class="clip-count" id="clipCountBadge">0 clips</span>
+                </div>
+                
+                <div class="clips-grid" id="clipsGrid">
+                    <!-- Clips will be dynamically added here -->
+                </div>
+            </section>
+
+            <!-- Log Viewer -->
+            <section class="glass-card logs-section">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <span class="icon">📋</span>
+                        Live Logs
+                    </h2>
+                    <button class="btn btn-ghost btn-small" id="clearLogsBtn">
+                        Clear
+                    </button>
+                </div>
+                
+                <div class="log-viewer" id="logViewer">
+                    <div class="log-entry info">
+                        <span class="log-time">--:--:--</span>
+                        <span class="log-message">Waiting for activity...</span>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>ViralClip v1.0.0 • Powered by AI • Made with ⚡</p>
+        </footer>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal" id="settingsModal" hidden>
+        <div class="modal-backdrop"></div>
+        <div class="modal-content glass-card">
+            <div class="modal-header">
+                <h2>Settings</h2>
+                <button class="modal-close" id="closeSettings">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="settings-section">
+                    <h3>Service Status</h3>
+                    <div class="service-list" id="serviceList">
+                        <!-- Services will be loaded dynamically -->
+                    </div>
+                </div>
+                
+                <div class="settings-section">
+                    <h3>System Status</h3>
+                    <div class="system-stats" id="systemStats">
+                        <!-- System stats will be loaded -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Clip Preview Modal -->
+    <div class="modal" id="previewModal" hidden>
+        <div class="modal-backdrop"></div>
+        <div class="modal-content glass-card modal-large">
+            <div class="modal-header">
+                <h2 id="previewTitle">Clip Preview</h2>
+                <button class="modal-close" id="closePreview">✕</button>
+            </div>
+            <div class="modal-body preview-body">
+                <div class="video-container">
+                    <video id="previewVideo" controls></video>
+                </div>
+                <div class="clip-details">
+                    <div class="clip-meta">
+                        <div class="meta-item">
+                            <span class="meta-label">Viral Score</span>
+                            <span class="meta-value viral-score" id="previewScore">--</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">Duration</span>
+                            <span class="meta-value" id="previewDuration">--</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">Mode</span>
+                            <span class="meta-value" id="previewMode">--</span>
+                        </div>
+                    </div>
+                    <div class="clip-description" id="previewDescription"></div>
+                    <div class="clip-actions">
+                        <button class="btn btn-primary" id="downloadClipBtn">
+                            <span class="icon">📥</span> Download
+                        </button>
+                        <button class="btn btn-secondary" id="shareClipBtn">
+                            <span class="icon">📤</span> Share to Social
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
