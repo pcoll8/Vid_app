@@ -314,7 +314,7 @@ class AICroppingService:
         scene_analysis: SceneAnalysis,
         progress_callback: Optional[Callable[[float, str], None]] = None
     ) -> List[CropFrame]:
-        """Generate crop trajectory (blocking)"""
+        """Generate crop trajectory with optimized frame skipping"""
         cap = cv2.VideoCapture(video_path)
         fps = cap.get(cv2.CAP_PROP_FPS)
         frame_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
@@ -329,9 +329,15 @@ class AICroppingService:
         # Reset stabilizer
         self.stabilizer.reset(frame_width // 2, frame_height // 2)
         
-        crop_frames = []
+        # Performance optimization: process every Nth frame, interpolate the rest
+        # For 30fps, process every 3rd frame (10fps detection)
+        skip_factor = max(1, int(fps / 10))
         
-        for i in range(total_frames):
+        keyframe_crops = []
+        keyframe_indices = []
+        
+        for i in range(0, total_frames, skip_factor):
+            cap.set(cv2.CAP_PROP_POS_FRAMES, start_frame + i)
             ret, frame = cap.read()
             if not ret:
                 break
@@ -341,16 +347,68 @@ class AICroppingService:
             else:
                 crop = self._general_mode_crop(frame_width, frame_height)
             
-            crop_frames.append(crop)
+            keyframe_crops.append(crop)
+            keyframe_indices.append(i)
             
-            if progress_callback and i % 30 == 0:
+            if progress_callback and len(keyframe_crops) % 10 == 0:
                 progress = (i / total_frames) * 100
-                progress_callback(progress, f"Processing frame {i}/{total_frames}")
+                progress_callback(progress, f"Analyzing frame {i}/{total_frames}")
         
         cap.release()
         
+        # Interpolate frames between keyframes
+        crop_frames = self._interpolate_crop_frames(
+            keyframe_crops, keyframe_indices, total_frames, scene_analysis.mode
+        )
+        
         if progress_callback:
             progress_callback(100, "Crop trajectory complete")
+        
+        return crop_frames
+    
+    def _interpolate_crop_frames(
+        self,
+        keyframes: List[CropFrame],
+        indices: List[int],
+        total_frames: int,
+        mode: CroppingMode
+    ) -> List[CropFrame]:
+        """Interpolate crop positions between keyframes for smooth motion"""
+        if not keyframes:
+            return []
+        
+        crop_frames = []
+        
+        for frame_idx in range(total_frames):
+            # Find surrounding keyframes
+            prev_key_idx = 0
+            next_key_idx = 0
+            
+            for i, ki in enumerate(indices):
+                if ki <= frame_idx:
+                    prev_key_idx = i
+                if ki >= frame_idx:
+                    next_key_idx = i
+                    break
+            else:
+                next_key_idx = len(keyframes) - 1
+            
+            if prev_key_idx == next_key_idx or indices[next_key_idx] == indices[prev_key_idx]:
+                # Use exact keyframe
+                crop_frames.append(keyframes[prev_key_idx])
+            else:
+                # Linear interpolation between keyframes
+                t = (frame_idx - indices[prev_key_idx]) / (indices[next_key_idx] - indices[prev_key_idx])
+                prev_crop = keyframes[prev_key_idx]
+                next_crop = keyframes[next_key_idx]
+                
+                crop_frames.append(CropFrame(
+                    center_x=int(prev_crop.center_x + t * (next_crop.center_x - prev_crop.center_x)),
+                    center_y=int(prev_crop.center_y + t * (next_crop.center_y - prev_crop.center_y)),
+                    crop_width=prev_crop.crop_width,
+                    crop_height=prev_crop.crop_height,
+                    mode=mode
+                ))
         
         return crop_frames
     

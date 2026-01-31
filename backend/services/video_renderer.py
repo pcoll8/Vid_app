@@ -26,8 +26,9 @@ class RenderConfig:
     video_bitrate: str = "4M"
     audio_bitrate: str = "128k"
     codec: str = "libx264"
-    preset: str = "medium"
-    crf: int = 23
+    preset: str = "fast"  # Faster encoding with minimal quality loss
+    crf: int = 22  # Slightly lower CRF for better quality
+    threads: int = 0  # Auto-detect optimal threads
 
 
 class VideoRenderer:
@@ -37,7 +38,23 @@ class VideoRenderer:
         self.output_dir = Path(output_dir)
         self.output_dir.mkdir(parents=True, exist_ok=True)
         self.config = RenderConfig()
+        self._has_nvenc = False
         self._check_ffmpeg()
+        self._detect_hardware_acceleration()
+    
+    def _detect_hardware_acceleration(self):
+        """Detect available hardware encoders"""
+        try:
+            result = subprocess.run(
+                ["ffmpeg", "-encoders"],
+                capture_output=True,
+                text=True
+            )
+            if "h264_nvenc" in result.stdout:
+                self._has_nvenc = True
+                logger.info("NVIDIA NVENC encoder detected")
+        except Exception:
+            pass
     
     def _check_ffmpeg(self):
         """Verify FFmpeg is available"""

@@ -53,24 +53,30 @@ class TranscriptionService:
         self._model_loaded = False
     
     def _ensure_model_loaded(self):
-        """Lazy load the Whisper model"""
+        """Lazy load the Whisper model with optimal settings"""
         if self._model_loaded:
             return
             
         logger.info(f"Loading Faster-Whisper model: {self.model_size}")
         
         try:
+            import os
             from faster_whisper import WhisperModel
+            
+            # Auto-detect optimal CPU threads (use 75% of available cores)
+            cpu_count = os.cpu_count() or 4
+            optimal_threads = max(2, int(cpu_count * 0.75))
             
             # CPU-optimized configuration with int8 quantization
             self.model = WhisperModel(
                 self.model_size,
                 device="cpu",
                 compute_type="int8",
-                cpu_threads=4
+                cpu_threads=optimal_threads,
+                num_workers=2,  # Parallel data loading
             )
             self._model_loaded = True
-            logger.info("Whisper model loaded successfully")
+            logger.info(f"Whisper model loaded (threads={optimal_threads})")
             
         except ImportError:
             logger.error("faster-whisper not installed. Run: pip install faster-whisper")

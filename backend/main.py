@@ -82,6 +82,56 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
+# ============================================================================
+# Global Exception Handlers
+# ============================================================================
+
+from fastapi import Request
+from fastapi.responses import JSONResponse
+from .utils.exceptions import ViralClipError
+
+
+@app.exception_handler(ViralClipError)
+async def viralclip_exception_handler(request: Request, exc: ViralClipError):
+    """Handle all ViralClip custom exceptions"""
+    logger.error(f"ViralClipError [{exc.code}]: {exc.message}")
+    return JSONResponse(
+        status_code=400 if exc.recoverable else 500,
+        content=exc.to_dict()
+    )
+
+
+@app.exception_handler(ValueError)
+async def validation_exception_handler(request: Request, exc: ValueError):
+    """Handle validation errors"""
+    logger.warning(f"Validation error: {exc}")
+    return JSONResponse(
+        status_code=400,
+        content={
+            "error": "VALIDATION_ERROR",
+            "message": str(exc),
+            "recoverable": True,
+            "recovery_hint": "Check your input parameters and try again."
+        }
+    )
+
+
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    """Handle any unhandled exceptions"""
+    logger.exception(f"Unhandled exception: {exc}")
+    return JSONResponse(
+        status_code=500,
+        content={
+            "error": "INTERNAL_ERROR",
+            "message": "An unexpected error occurred. Please try again.",
+            "recoverable": True,
+            "recovery_hint": "If this persists, check the server logs for details."
+        }
+    )
+
+
 # Include routers
 app.include_router(jobs_router)
 app.include_router(clips_router)
