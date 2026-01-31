@@ -125,7 +125,7 @@ Copy `.env.example` to `.env` and configure the following:
 
 ```env
 # Clip settings
-MIN_CLIP_DURATION=15
+MIN_CLIP_DURATION=45
 MAX_CLIP_DURATION=60
 DEFAULT_CLIP_COUNT=5
 

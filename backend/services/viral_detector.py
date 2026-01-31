@@ -47,7 +47,7 @@ class ViralDetector:
         try:
             import google.generativeai as genai
             genai.configure(api_key=self.settings.gemini_api_key)
-            self._client = genai.GenerativeModel('gemini-2.0-flash-exp')
+            self._client = genai.GenerativeModel('gemini-2.5-flash')
             logger.info("Gemini client initialized")
         except ImportError:
             logger.error("google-generativeai not installed")
@@ -58,7 +58,7 @@ class ViralDetector:
         transcript: TranscriptionResult,
         video_title: str = "",
         clip_count: int = 5,
-        min_duration: int = 15,
+        min_duration: int = 45,
         max_duration: int = 60,
         progress_callback: Optional[Callable[[float, str], None]] = None
     ) -> List[ViralMoment]:

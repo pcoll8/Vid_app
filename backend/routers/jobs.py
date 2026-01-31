@@ -37,7 +37,7 @@ async def create_job(
     background_tasks: BackgroundTasks,
     source_url: Optional[str] = Form(None),
     clip_count: int = Form(5),
-    min_duration: int = Form(15),
+    min_duration: int = Form(45),
     max_duration: int = Form(60),
     enable_dubbing: bool = Form(False),
     dubbing_language: Optional[str] = Form(None),

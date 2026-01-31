@@ -28,7 +28,7 @@ class JobCreate(BaseModel):
     source_url: Optional[str] = Field(None, description="YouTube URL to process")
     source_file: Optional[str] = Field(None, description="Local file path")
     clip_count: int = Field(default=5, ge=1, le=15, description="Number of clips to generate")
-    min_duration: int = Field(default=15, ge=5, le=30, description="Minimum clip duration")
+    min_duration: int = Field(default=45, ge=30, le=60, description="Minimum clip duration")
     max_duration: int = Field(default=60, ge=30, le=180, description="Maximum clip duration")
     enable_dubbing: bool = Field(default=False, description="Enable voice dubbing")
     dubbing_language: Optional[str] = Field(None, description="Target language for dubbing")
@@ -45,7 +45,7 @@ class Job(BaseModel):
     video_title: Optional[str] = None
     video_duration: Optional[float] = None
     clip_count: int = 5
-    min_duration: int = 15
+    min_duration: int = 45
     max_duration: int = 60
     enable_dubbing: bool = False
     dubbing_language: Optional[str] = None

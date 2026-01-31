@@ -48,8 +48,8 @@ class Settings(BaseSettings):
     # Processing Settings
     # ==========================================================================
     whisper_model: str = Field(default="base", description="Whisper model size")
-    min_clip_duration: int = Field(default=15, ge=5, le=30)
-    max_clip_duration: int = Field(default=60, ge=30, le=180)
+    min_clip_duration: int = Field(default=45, ge=30, le=60)
+    max_clip_duration: int = Field(default=60, ge=45, le=180)
     viral_moments_count: int = Field(default=5, ge=3, le=15)
     
     # ==========================================================================
