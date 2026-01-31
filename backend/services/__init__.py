@@ -7,6 +7,7 @@ from .video_renderer import VideoRenderer
 from .s3_uploader import S3Uploader
 from .voice_dubber import VoiceDubber
 from .social_poster import SocialPoster
+from .schedule_service import ScheduleService, get_scheduler
 
 __all__ = [
     "YouTubeDownloader",
@@ -16,5 +17,8 @@ __all__ = [
     "VideoRenderer",
     "S3Uploader",
     "VoiceDubber",
-    "SocialPoster"
+    "SocialPoster",
+    "ScheduleService",
+    "get_scheduler"
 ]
+

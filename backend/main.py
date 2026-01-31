@@ -14,7 +14,8 @@ from fastapi.responses import FileResponse
 
 from .config import get_settings
 from .utils.logger import setup_logger
-from .routers import jobs_router, clips_router, settings_router, websocket_router
+from .routers import jobs_router, clips_router, settings_router, websocket_router, schedules_router
+from .services.schedule_service import get_scheduler
 
 
 # Set up logging
@@ -59,9 +60,16 @@ async def lifespan(app: FastAPI):
     logger.info("API Docs: http://localhost:8000/docs")
     logger.info("=" * 60)
     
+    # Start the background scheduler for scheduled posts
+    import asyncio
+    scheduler = get_scheduler()
+    scheduler_task = asyncio.create_task(scheduler.start_scheduler(check_interval=60))
+    logger.info("[OK] Scheduler started for scheduled social media posts")
+    
     yield
     
     # Cleanup on shutdown
+    scheduler.stop_scheduler()
     logger.info("Shutting down ViralClip...")
 
 
@@ -137,6 +145,7 @@ app.include_router(jobs_router)
 app.include_router(clips_router)
 app.include_router(settings_router)
 app.include_router(websocket_router)
+app.include_router(schedules_router)
 
 # Static file serving for output clips
 settings = get_settings()
