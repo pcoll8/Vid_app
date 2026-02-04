@@ -1,6 +1,6 @@
 """
 YouTube Downloader Service
-Downloads videos from YouTube using yt-dlp
+Downloads videos from YouTube using yt-dlp otherwise upload the file from device
 """
 
 import os
