@@ -15,7 +15,7 @@ yt-dlp==2026.1.29
 faster-whisper==1.2.1
 
 # AI - Gemini (Viral Detection)
-google-generativeai==0.8.6
+google-genai==0.2.1
 
 # Video Processing - Scene Detection (lightweight alternative to MediaPipe/YOLOv8)
 scenedetect[opencv-headless]==0.6.5

@@ -45,12 +45,11 @@ class ViralDetector:
             raise ValueError("GEMINI_API_KEY not configured")
         
         try:
-            import google.generativeai as genai
-            genai.configure(api_key=self.settings.gemini_api_key)
-            self._client = genai.GenerativeModel('gemini-2.5-flash')
+            from google import genai
+            self._client = genai.Client(api_key=self.settings.gemini_api_key)
             logger.info("Gemini client initialized")
         except ImportError:
-            logger.error("google-generativeai not installed")
+            logger.error("google-genai not installed")
             raise
     
     async def detect_viral_moments(
@@ -103,7 +102,10 @@ class ViralDetector:
         loop = asyncio.get_event_loop()
         response = await loop.run_in_executor(
             None,
-            lambda: self._client.generate_content(prompt)
+            lambda: self._client.models.generate_content(
+                model='gemini-2.0-flash',
+                contents=prompt
+            )
         )
         
         if progress_callback:
