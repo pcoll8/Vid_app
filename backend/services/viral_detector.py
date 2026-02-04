@@ -104,7 +104,16 @@ class ViralDetector:
             None,
             lambda: self._client.models.generate_content(
                 model='gemini-2.0-flash',
-                contents=prompt
+                contents=prompt,
+                config={
+                    'response_mime_type': 'application/json',
+                    'safety_settings': [
+                        {'category': 'HARM_CATEGORY_HARASSMENT', 'threshold': 'BLOCK_NONE'},
+                        {'category': 'HARM_CATEGORY_HATE_SPEECH', 'threshold': 'BLOCK_NONE'},
+                        {'category': 'HARM_CATEGORY_SEXUALLY_EXPLICIT', 'threshold': 'BLOCK_NONE'},
+                        {'category': 'HARM_CATEGORY_DANGEROUS_CONTENT', 'threshold': 'BLOCK_NONE'}
+                    ]
+                }
             )
         )
         
@@ -112,6 +121,10 @@ class ViralDetector:
             progress_callback(80, "Parsing AI response...")
         
         # Parse the response
+        if not response or not hasattr(response, 'text') or not response.text:
+            logger.error("Gemini returned empty response (possibly blocked)")
+            return []
+            
         moments = self._parse_response(response.text)
         
         # Sort by viral score
