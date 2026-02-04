@@ -48,12 +48,12 @@ RUN mkdir -p output temp data
 ENV PYTHONUNBUFFERED=1
 ENV PYTHONDONTWRITEBYTECODE=1
 
-# Expose port (DigitalOcean App Platform uses 8080 by default)
+# Expose port (Railway uses dynamic PORT env var)
 EXPOSE 8080
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8080/api/settings/health')" || exit 1
+    CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:${PORT:-8080}/api/settings/health')" || exit 1
 
-# Run the application
-CMD ["uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "8080"]
+# Run the application (Railway injects PORT env var)
+CMD uvicorn backend.main:app --host 0.0.0.0 --port ${PORT:-8080}

@@ -28,7 +28,8 @@ Vid_app/
 │   ├── css/style.css     # Glassmorphism styles
 │   └── js/app.js         # Client-side logic
 ├── Dockerfile            # Production container
-└── .do/app.yaml          # DigitalOcean deployment
+├── railway.json          # Railway deployment config
+└── docker-compose.yml    # Local development
 ```
 
 ## Common Commands

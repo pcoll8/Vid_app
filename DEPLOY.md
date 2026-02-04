@@ -1,36 +1,23 @@
 # ViralClip Deployment Guide
 
-## DigitalOcean App Platform Deployment
+## Railway Deployment (Recommended)
 
-### Prerequisites
-- DigitalOcean account
-- GitHub repository connected to DigitalOcean
-- API keys for services you want to use
+Railway offers the easiest deployment experience with automatic builds from GitHub.
 
 ### Quick Deploy
 
-#### Option 1: Deploy via Dashboard
-1. Go to [DigitalOcean App Platform](https://cloud.digitalocean.com/apps)
-2. Click **Create App**
-3. Select **GitHub** and choose this repository
-4. DigitalOcean will auto-detect the Dockerfile
-5. Configure environment variables (see below)
-6. Choose your plan (recommended: **Basic $20/month** for video processing)
-7. Click **Create Resources**
+1. **Go to** [Railway](https://railway.app/)
+2. **Sign in** with GitHub
+3. **New Project** → **Deploy from GitHub repo**
+4. **Select** this repository
+5. **Add environment variables** (see below)
+6. **Deploy!**
 
-#### Option 2: Deploy via CLI
-```bash
-# Install doctl CLI
-# https://docs.digitalocean.com/reference/doctl/how-to/install/
+Railway will auto-detect the Dockerfile and deploy automatically.
 
-# Authenticate
-doctl auth init
+### Environment Variables
 
-# Deploy using the app spec
-doctl apps create --spec .do/app.yaml
-```
-
-### Environment Variables to Configure
+Add these in Railway dashboard → Variables:
 
 | Variable | Required | Description |
 |----------|----------|-------------|
@@ -42,22 +29,26 @@ doctl apps create --spec .do/app.yaml
 | `INSTAGRAM_ACCESS_TOKEN` | No | Instagram posting |
 | `YOUTUBE_CLIENT_ID` | No | YouTube posting |
 
-### Resource Sizing
+### Pricing
 
-| Plan | Specs | Cost | Use Case |
-|------|-------|------|----------|
-| Basic XXS | 1 vCPU, 512MB | $5/mo | Testing only |
-| Basic XS | 1 vCPU, 1GB | $10/mo | Light usage |
-| **Basic S** | 1 vCPU, 2GB | $20/mo | **Recommended** |
-| Basic M | 2 vCPU, 4GB | $40/mo | Production |
+- **Free Tier**: $5 credit/month (good for testing)
+- **Hobby**: $5/month + usage
+- **Pro**: $20/month + usage (recommended for production)
+
+### Custom Domain
+
+1. Go to **Settings** → **Domains**
+2. Add your domain
+3. Update DNS records as shown
 
 ### Verify Deployment
+
 ```bash
 # Check health
-curl https://your-app.ondigitalocean.app/api/settings/health
+curl https://your-app.up.railway.app/api/settings/health
 
 # View API docs
-# https://your-app.ondigitalocean.app/docs
+# https://your-app.up.railway.app/docs
 ```
 
 ---
@@ -75,6 +66,27 @@ docker-compose up --build
 
 ---
 
+## Railway CLI (Optional)
+
+```bash
+# Install Railway CLI
+npm install -g @railway/cli
+
+# Login
+railway login
+
+# Link to project
+railway link
+
+# Deploy
+railway up
+
+# View logs
+railway logs
+```
+
+---
+
 ## Troubleshooting
 
 ### Build fails
@@ -82,9 +94,9 @@ docker-compose up --build
 - Ensure Python version matches (3.11)
 
 ### App crashes on startup
-- Verify all required env vars are set
-- Check logs: `doctl apps logs <app-id>`
+- Verify `GEMINI_API_KEY` is set
+- Check logs in Railway dashboard
 
 ### Video processing slow
-- Upgrade to a larger instance (Basic M or Pro)
+- Railway auto-scales, but consider Pro plan for more resources
 - Use `tiny` Whisper model for faster transcription

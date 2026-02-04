@@ -1,4 +1,28 @@
+# =============================================================================
+# PRIVATE/SENSITIVE - Never commit these
+# =============================================================================
+# Environment files with secrets
+.env
+.env.local
+.env.*.local
+.env.production
+.env.staging
+*.env
+
+# Credentials and keys
+*.pem
+*.key
+*.crt
+*.p12
+credentials.json
+service-account*.json
+*_credentials.json
+secrets/
+.secrets/
+
+# =============================================================================
 # Python
+# =============================================================================
 __pycache__/
 *.py[cod]
 *$py.class
@@ -9,37 +33,77 @@ venv/
 .venv/
 pip-log.txt
 pip-delete-this-directory.txt
+.eggs/
+*.egg-info/
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
 
-# Environment
-.env
-.env.local
-
-# IDE
+# =============================================================================
+# IDE and Editors
+# =============================================================================
 .idea/
 .vscode/
 *.swp
 *.swo
+*.sublime-*
+*.code-workspace
 
-# Output and temp
+# =============================================================================
+# Output and Processing (user data)
+# =============================================================================
 output/
 temp/
+data/
+uploads/
+downloads/
 *.mp4
 *.mp3
 *.wav
 *.webm
+*.avi
+*.mov
+*.mkv
 
-# Models (large files)
+# =============================================================================
+# AI/ML Models (large files)
+# =============================================================================
 *.pt
+*.pth
 *.onnx
 *.bin
+*.h5
+*.pkl
+models/
 
-# Logs
+# =============================================================================
+# Logs and Debug
+# =============================================================================
 *.log
 logs/
+debug/
+*.stackdump
 
-# OS
+# =============================================================================
+# OS Generated
+# =============================================================================
 .DS_Store
+.DS_Store?
+._*
 Thumbs.db
+ehthumbs.db
+Desktop.ini
 
-# Node (if any frontend build)
+# =============================================================================
+# Node/Frontend Build
+# =============================================================================
 node_modules/
+dist/
+build/
+.cache/
+
+# =============================================================================
+# Scheduled Posts Data (may contain user content)
+# =============================================================================
+scheduled_posts.json
