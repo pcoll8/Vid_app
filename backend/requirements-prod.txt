@@ -1,0 +1,36 @@
+# ViralClip Production Dependencies (Lightweight)
+# For Railway/Cloud deployment - excludes heavy ML packages
+# Full AI features require local deployment with requirements.txt
+
+# Core Framework
+fastapi==0.128.0
+uvicorn[standard]==0.40.0
+python-multipart>=0.0.22
+python-dotenv>=1.2.0
+pydantic-settings==2.12.0
+
+# Video Download
+yt-dlp==2026.1.29
+
+# AI - Gemini only (lightweight)
+google-generativeai==0.8.6
+
+# Cloud Storage
+boto3==1.42.39
+
+# Voice Dubbing
+elevenlabs==2.33.1
+
+# Async & WebSocket
+websockets==15.0.1
+aiofiles==25.1.0
+aiohttp>=3.13.0
+
+# System
+psutil>=7.2.0
+
+# Note: The following heavy packages are OPTIONAL for cloud:
+# - faster-whisper (transcription) - install locally for full features
+# - mediapipe (face detection) - install locally for TRACK mode
+# - ultralytics (YOLOv8) - install locally for person detection
+# - opencv-python - install locally for video processing
