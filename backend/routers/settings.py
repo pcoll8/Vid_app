@@ -92,9 +92,37 @@ async def health_check():
     """Health check endpoint"""
     return {
         "status": "healthy",
-        "version": "1.0.0",
+        "version": get_app_version(),
         "app": "ViralClip"
     }
+
+
+@router.get("/version")
+async def get_version_info():
+    """Get application version control info"""
+    return {
+        "version": "1.0.0",
+        "git_commit": get_git_revision(),
+        "environment": "production"  # In a real app, read from env var
+    }
+
+
+def get_git_revision():
+    """Get the current git commit hash (short)"""
+    import os
+    
+    # Try Railway env var first
+    commit_sha = os.getenv('RAILWAY_GIT_COMMIT_SHA') or os.getenv('GIT_COMMIT_SHA')
+    
+    if commit_sha:
+        return commit_sha[:7]  # Return short hash
+        
+    return "dev"
+
+def get_app_version():
+    """Get formatted app version"""
+    git_hash = get_git_revision()
+    return f"1.0.0-{git_hash}"
 
 
 @router.get("/system-status")
