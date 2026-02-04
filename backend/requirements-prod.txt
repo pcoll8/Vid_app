@@ -12,6 +12,9 @@ pydantic-settings==2.12.0
 # Video Download
 yt-dlp==2026.1.29
 
+# AI - Transcription (required for clip detection)
+faster-whisper==1.2.1
+
 # AI - Gemini only (lightweight)
 google-generativeai==0.8.6
 
