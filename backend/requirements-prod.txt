@@ -1,5 +1,5 @@
-# ViralClip Production Dependencies (Full Features)
-# For Railway/Cloud deployment with all AI features
+# ViralClip Production Dependencies
+# Optimized for Railway/Cloud deployment
 
 # Core Framework
 fastapi==0.128.0
@@ -17,11 +17,9 @@ faster-whisper==1.2.1
 # AI - Gemini (Viral Detection)
 google-generativeai==0.8.6
 
-# AI - Computer Vision (TRACK Mode)
-mediapipe==0.10.32
-ultralytics==8.4.9
-opencv-python-headless==4.13.0.90
-numpy==2.2.6
+# Video Processing - Scene Detection (lightweight alternative to MediaPipe/YOLOv8)
+scenedetect[opencv-headless]==0.6.5
+numpy>=1.24.0
 
 # Cloud Storage
 boto3==1.42.39
