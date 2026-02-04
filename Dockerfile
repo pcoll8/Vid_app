@@ -31,4 +31,4 @@ ENV PYTHONDONTWRITEBYTECODE=1
 EXPOSE 8080
 
 # Run the application (Railway injects PORT env var)
-CMD ["sh", "-c", "uvicorn backend.main:app --host 0.0.0.0 --port ${PORT:-8080}"]
+CMD sh -c "uvicorn backend.main:app --host 0.0.0.0 --port ${PORT:-8080}"
