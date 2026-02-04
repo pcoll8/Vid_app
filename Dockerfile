@@ -27,7 +27,9 @@ RUN mkdir -p output temp data
 ENV PYTHONUNBUFFERED=1
 ENV PYTHONDONTWRITEBYTECODE=1
 
-# Expose port
-EXPOSE 8080
+# Copy startup script
+COPY start.sh .
+RUN chmod +x start.sh
 
-# Start command is defined in railway.json
+# Start the application
+CMD ["./start.sh"]
