@@ -2,9 +2,10 @@
 AI Cropping Service
 Dual-mode intelligent cropping using MediaPipe and YOLOv8
 """
+from __future__ import annotations
 
 import asyncio
-from typing import List, Tuple, Optional, Callable
+from typing import List, Tuple, Optional, Callable, TYPE_CHECKING
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
