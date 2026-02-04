@@ -1,0 +1,54 @@
+# ViralClip - Docker Compose for local development and testing
+# Use this to test the Docker setup before deploying to DigitalOcean
+
+version: '3.8'
+
+services:
+  viralclip:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: viralclip
+    ports:
+      - "8000:8080"
+    environment:
+      # Required
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+
+      # Optional - AWS S3
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID:-}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY:-}
+      - AWS_REGION=${AWS_REGION:-us-east-1}
+      - S3_BUCKET_NAME=${S3_BUCKET_NAME:-}
+
+      # Optional - ElevenLabs
+      - ELEVENLABS_API_KEY=${ELEVENLABS_API_KEY:-}
+
+      # Optional - Social Media
+      - INSTAGRAM_ACCESS_TOKEN=${INSTAGRAM_ACCESS_TOKEN:-}
+      - INSTAGRAM_BUSINESS_ACCOUNT_ID=${INSTAGRAM_BUSINESS_ACCOUNT_ID:-}
+      - YOUTUBE_CLIENT_ID=${YOUTUBE_CLIENT_ID:-}
+      - YOUTUBE_CLIENT_SECRET=${YOUTUBE_CLIENT_SECRET:-}
+
+      # Processing settings
+      - WHISPER_MODEL=${WHISPER_MODEL:-base}
+      - MIN_CLIP_DURATION=${MIN_CLIP_DURATION:-45}
+      - MAX_CLIP_DURATION=${MAX_CLIP_DURATION:-60}
+      - VIRAL_MOMENTS_COUNT=${VIRAL_MOMENTS_COUNT:-5}
+    volumes:
+      # Persist output clips
+      - ./output:/app/output
+      - ./temp:/app/temp
+      - ./data:/app/data
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8080/api/settings/health')" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+# For production with external volumes:
+# volumes:
+#   output_data:
+#   temp_data:

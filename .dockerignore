@@ -1,0 +1,59 @@
+# Ignore unnecessary files during Docker build
+# This makes builds faster and images smaller
+
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Python
+__pycache__
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv
+venv/
+ENV/
+.eggs
+*.egg-info/
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Development files
+*.md
+!README.md
+.env
+.env.local
+.env.*.local
+*.log
+
+# Output directories (will be created at runtime)
+output/
+temp/
+data/
+
+# Documentation
+docs/
+*.rst
+
+# Tests
+tests/
+test_*.py
+*_test.py
+
+# DigitalOcean config (not needed in container)
+.do/
+
+# Other
+.DS_Store
+Thumbs.db
+*.bak
