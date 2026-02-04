@@ -4,8 +4,6 @@ Dual-mode intelligent cropping using MediaPipe and YOLOv8
 """
 
 import asyncio
-import cv2
-import numpy as np
 from typing import List, Tuple, Optional, Callable
 from dataclasses import dataclass
 from enum import Enum
@@ -15,6 +13,32 @@ from ..utils.logger import get_logger
 from ..utils.stabilizer import HeavyTripodStabilizer, StabilizerConfig
 
 logger = get_logger()
+
+# Lazy imports for heavy packages (not available in production deployment)
+cv2 = None
+np = None
+
+def _ensure_cv2():
+    """Lazy load OpenCV"""
+    global cv2
+    if cv2 is None:
+        try:
+            import cv2 as _cv2
+            cv2 = _cv2
+        except ImportError:
+            raise ImportError("OpenCV (cv2) is required for AI cropping. Install with: pip install opencv-python")
+    return cv2
+
+def _ensure_numpy():
+    """Lazy load NumPy"""
+    global np
+    if np is None:
+        try:
+            import numpy as _np
+            np = _np
+        except ImportError:
+            raise ImportError("NumPy is required for AI cropping. Install with: pip install numpy")
+    return np
 
 
 class CroppingMode(str, Enum):

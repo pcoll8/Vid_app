@@ -3,9 +3,30 @@ Heavy Tripod Stabilization Engine
 Provides ultra-smooth camera tracking with velocity clamping and exponential smoothing
 """
 
-import numpy as np
+import math
 from typing import Tuple, Optional, List
 from dataclasses import dataclass, field
+
+# Lazy import for numpy (not available in production deployment)
+np = None
+
+def _ensure_numpy():
+    """Lazy load NumPy"""
+    global np
+    if np is None:
+        try:
+            import numpy as _np
+            np = _np
+        except ImportError:
+            # Fall back to math module for basic operations
+            np = None
+    return np
+
+def _sqrt(x):
+    """Safe sqrt using numpy if available, else math"""
+    if _ensure_numpy() is not None:
+        return np.sqrt(x)
+    return math.sqrt(x)
 
 
 @dataclass
@@ -89,7 +110,7 @@ class HeavyTripodStabilizer:
         # Calculate distance to target
         dx = self.state.target_x - self.state.current_x
         dy = self.state.target_y - self.state.current_y
-        distance = np.sqrt(dx * dx + dy * dy)
+        distance = _sqrt(dx * dx + dy * dy)
         
         # Apply deadzone
         if distance < self.config.deadzone:
@@ -114,7 +135,7 @@ class HeavyTripodStabilizer:
         self.state.velocity_y += (desired_vy - self.state.velocity_y) * self.config.acceleration_smoothing
         
         # Clamp velocity
-        velocity_magnitude = np.sqrt(
+        velocity_magnitude = _sqrt(
             self.state.velocity_x ** 2 + self.state.velocity_y ** 2
         )
         if velocity_magnitude > self.config.max_velocity:
@@ -127,7 +148,7 @@ class HeavyTripodStabilizer:
         self.state.current_y += self.state.velocity_y
         
         # Check if we've reached the target (for re-locking)
-        new_distance = np.sqrt(
+        new_distance = _sqrt(
             (self.state.target_x - self.state.current_x) ** 2 +
             (self.state.target_y - self.state.current_y) ** 2
         )
