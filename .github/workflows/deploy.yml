@@ -1,5 +1,5 @@
 # GitHub Actions workflow to trigger Railway deployment
-# This serves as a backup when Railway's native webhook doesn't trigger
+# Uses Railway's deploy webhook for reliability
 
 name: Deploy to Railway
 
@@ -15,15 +15,9 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Deploy to Railway
-        env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+      - name: Trigger Railway Deploy Webhook
         run: |
-          # Install Railway CLI
-          npm install -g @railway/cli
-          
-          # Trigger deploy using Railway CLI
-          railway up --detach
+          curl -X POST "${{ secrets.RAILWAY_DEPLOY_WEBHOOK }}" \
+            -H "Content-Type: application/json" \
+            --fail --silent --show-error
+          echo "Deploy triggered successfully!"
