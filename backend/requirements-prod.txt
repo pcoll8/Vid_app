@@ -35,6 +35,7 @@ elevenlabs==2.33.1
 # Async & WebSocket
 websockets>=13.0,<15.0
 aiofiles==25.1.0
+aiosqlite==0.22.1
 aiohttp>=3.13.0
 
 # System

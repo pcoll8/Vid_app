@@ -18,7 +18,7 @@ class WebSocketLogHandler(logging.Handler):
     
     def __init__(self):
         super().__init__()
-        self.log_queue: Queue = Queue()
+        self.log_queue: Queue = Queue(maxsize=1000)
         WebSocketLogHandler._instances.append(self)
     
     def emit(self, record: logging.LogRecord):
@@ -29,7 +29,12 @@ class WebSocketLogHandler(logging.Handler):
                 "message": self.format(record),
                 "module": record.module
             }
-            self.log_queue.put(log_entry)
+            if self.log_queue.full():
+                try:
+                    self.log_queue.get_nowait()
+                except Exception:
+                    pass
+            self.log_queue.put_nowait(log_entry)
         except Exception:
             self.handleError(record)
     

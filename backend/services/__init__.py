@@ -8,6 +8,8 @@ from .s3_uploader import S3Uploader
 from .voice_dubber import VoiceDubber
 from .social_poster import SocialPoster
 from .schedule_service import ScheduleService, get_scheduler
+from .job_store import JobStore, get_job_store
+from .job_queue import JobQueue, get_job_queue
 
 __all__ = [
     "YouTubeDownloader",
@@ -19,6 +21,10 @@ __all__ = [
     "VoiceDubber",
     "SocialPoster",
     "ScheduleService",
-    "get_scheduler"
+    "get_scheduler",
+    "JobStore",
+    "get_job_store",
+    "JobQueue",
+    "get_job_queue"
 ]
 

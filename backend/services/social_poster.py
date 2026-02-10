@@ -47,7 +47,18 @@ class SocialPoster:
     
     def __init__(self):
         self.settings = get_settings()
+        self.beta_enabled = self.settings.enable_beta_social_posting
         self._profiles: Dict[str, SocialProfile] = {}
+
+    def _beta_disabled_result(self, platform: Platform) -> PostResult:
+        return PostResult(
+            platform=platform,
+            success=False,
+            error_message=(
+                "Social posting is beta-disabled. "
+                "Set ENABLE_BETA_SOCIAL_POSTING=true to enable."
+            )
+        )
     
     def add_profile(self, profile: SocialProfile):
         """Add or update a social profile"""
@@ -74,6 +85,9 @@ class SocialPoster:
         
         Uses Instagram Graph API (requires Facebook Business account)
         """
+        if not self.beta_enabled:
+            return self._beta_disabled_result(Platform.INSTAGRAM)
+
         logger.info(f"Posting to Instagram: {caption[:50]}...")
         
         if not self.settings.instagram_access_token:
@@ -143,6 +157,9 @@ class SocialPoster:
         
         Uses YouTube Data API v3
         """
+        if not self.beta_enabled:
+            return self._beta_disabled_result(Platform.YOUTUBE)
+
         logger.info(f"Posting to YouTube: {title}")
         
         if not self.settings.youtube_client_id:
@@ -221,6 +238,9 @@ class SocialPoster:
         """
         if platforms is None:
             platforms = [Platform.INSTAGRAM, Platform.YOUTUBE]
+
+        if not self.beta_enabled:
+            return [self._beta_disabled_result(platform) for platform in platforms]
         
         results = []
         total = len(platforms)

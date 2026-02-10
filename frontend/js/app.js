@@ -11,7 +11,8 @@ const state = {
     currentJob: null,
     clips: [],
     wsConnected: false,
-    ws: null
+    ws: null,
+    apiKey: ''
 };
 
 // ============================================================================
@@ -84,7 +85,10 @@ const elements = {
 
 function connectWebSocket() {
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const wsUrl = `${protocol}//${window.location.host}/ws`;
+    const token = getApiKey();
+    const wsUrl = token
+        ? `${protocol}//${window.location.host}/ws?token=${encodeURIComponent(token)}`
+        : `${protocol}//${window.location.host}/ws`;
 
     try {
         state.ws = new WebSocket(wsUrl);
@@ -165,8 +169,36 @@ function updateConnectionStatus(status) {
 // API Functions
 // ============================================================================
 
+function getApiKey() {
+    if (state.apiKey) return state.apiKey;
+
+    const queryToken = new URLSearchParams(window.location.search).get('api_key');
+    if (queryToken) {
+        state.apiKey = queryToken;
+        localStorage.setItem('viralclip_api_key', queryToken);
+        return state.apiKey;
+    }
+
+    const stored = localStorage.getItem('viralclip_api_key') || '';
+    state.apiKey = stored;
+    return state.apiKey;
+}
+
+async function apiFetch(url, options = {}) {
+    const headers = new Headers(options.headers || {});
+    const apiKey = getApiKey();
+    if (apiKey) {
+        headers.set('x-api-key', apiKey);
+    }
+
+    return fetch(url, {
+        ...options,
+        headers
+    });
+}
+
 async function createJob(formData) {
-    const response = await fetch('/api/jobs/', {
+    const response = await apiFetch('/api/jobs/', {
         method: 'POST',
         body: formData
     });
@@ -180,25 +212,25 @@ async function createJob(formData) {
 }
 
 async function getJobClips(jobId) {
-    const response = await fetch(`/api/jobs/${jobId}/clips`);
+    const response = await apiFetch(`/api/jobs/${jobId}/clips`);
     if (!response.ok) throw new Error('Failed to fetch clips');
     return response.json();
 }
 
 async function getSettings() {
-    const response = await fetch('/api/settings/');
+    const response = await apiFetch('/api/settings/');
     if (!response.ok) throw new Error('Failed to fetch settings');
     return response.json();
 }
 
 async function getSystemStatus() {
-    const response = await fetch('/api/settings/system-status');
+    const response = await apiFetch('/api/settings/system-status');
     if (!response.ok) throw new Error('Failed to fetch system status');
     return response.json();
 }
 
 async function getClipDownloadUrl(clipId) {
-    const response = await fetch(`/api/clips/${clipId}/download`);
+    const response = await apiFetch(`/api/clips/${clipId}/download`);
     if (!response.ok) throw new Error('Failed to get download URL');
     return response.json();
 }

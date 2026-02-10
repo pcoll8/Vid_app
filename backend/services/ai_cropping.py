@@ -5,41 +5,14 @@ Dual-mode intelligent cropping using MediaPipe and YOLOv8
 from __future__ import annotations
 
 import asyncio
-from typing import List, Tuple, Optional, Callable, TYPE_CHECKING
+from typing import List, Optional, Callable
 from dataclasses import dataclass
 from enum import Enum
-from pathlib import Path
 
 from ..utils.logger import get_logger
 from ..utils.stabilizer import HeavyTripodStabilizer, StabilizerConfig
 
 logger = get_logger()
-
-# Lazy imports for heavy packages (not available in production deployment)
-cv2 = None
-np = None
-
-def _ensure_cv2():
-    """Lazy load OpenCV"""
-    global cv2
-    if cv2 is None:
-        try:
-            import cv2 as _cv2
-            cv2 = _cv2
-        except ImportError:
-            raise ImportError("OpenCV (cv2) is required for AI cropping. Install with: pip install opencv-python")
-    return cv2
-
-def _ensure_numpy():
-    """Lazy load NumPy"""
-    global np
-    if np is None:
-        try:
-            import numpy as _np
-            np = _np
-        except ImportError:
-            raise ImportError("NumPy is required for AI cropping. Install with: pip install numpy")
-    return np
 
 
 class CroppingMode(str, Enum):
@@ -173,8 +146,18 @@ class AICroppingService:
         sample_frames: int
     ) -> SceneAnalysis:
         """Perform scene analysis (blocking)"""
-        cap = cv2.VideoCapture(video_path)
-        fps = cap.get(cv2.CAP_PROP_FPS)
+        if self._cv2 is None or self._np is None:
+            return SceneAnalysis(
+                mode=CroppingMode.GENERAL,
+                face_count=0,
+                primary_face=None,
+                all_faces=[],
+                movement_score=0.0,
+                reason="OpenCV/NumPy unavailable - fallback to GENERAL mode"
+            )
+
+        cap = self._cv2.VideoCapture(video_path)
+        fps = cap.get(self._cv2.CAP_PROP_FPS) or 30.0
         
         duration = end_time - start_time
         sample_interval = duration / sample_frames
@@ -187,7 +170,7 @@ class AICroppingService:
         for i in range(sample_frames):
             time_offset = start_time + (i * sample_interval)
             frame_num = int(time_offset * fps)
-            cap.set(cv2.CAP_PROP_POS_FRAMES, frame_num)
+            cap.set(self._cv2.CAP_PROP_POS_FRAMES, frame_num)
             ret, frame = cap.read()
             
             if not ret:
@@ -208,9 +191,9 @@ class AICroppingService:
         cap.release()
         
         # Analyze results
-        avg_faces = np.mean(face_counts) if face_counts else 0
+        avg_faces = self._np.mean(face_counts) if face_counts else 0
         max_faces = max(face_counts) if face_counts else 0
-        avg_movement = np.mean(movement_scores) if movement_scores else 0
+        avg_movement = self._np.mean(movement_scores) if movement_scores else 0
         
         # Determine mode
         if avg_faces <= 1.5 and max_faces <= 2:
@@ -331,16 +314,19 @@ class AICroppingService:
         progress_callback: Optional[Callable[[float, str], None]] = None
     ) -> List[CropFrame]:
         """Generate crop trajectory with optimized frame skipping"""
-        cap = cv2.VideoCapture(video_path)
-        fps = cap.get(cv2.CAP_PROP_FPS)
-        frame_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-        frame_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+        if self._cv2 is None:
+            raise RuntimeError("OpenCV is required for crop trajectory generation")
+
+        cap = self._cv2.VideoCapture(video_path)
+        fps = cap.get(self._cv2.CAP_PROP_FPS) or 30.0
+        frame_width = int(cap.get(self._cv2.CAP_PROP_FRAME_WIDTH))
+        frame_height = int(cap.get(self._cv2.CAP_PROP_FRAME_HEIGHT))
         
         start_frame = int(start_time * fps)
         end_frame = int(end_time * fps)
         total_frames = end_frame - start_frame
         
-        cap.set(cv2.CAP_PROP_POS_FRAMES, start_frame)
+        cap.set(self._cv2.CAP_PROP_POS_FRAMES, start_frame)
         
         # Reset stabilizer
         self.stabilizer.reset(frame_width // 2, frame_height // 2)
@@ -353,7 +339,7 @@ class AICroppingService:
         keyframe_indices = []
         
         for i in range(0, total_frames, skip_factor):
-            cap.set(cv2.CAP_PROP_POS_FRAMES, start_frame + i)
+            cap.set(self._cv2.CAP_PROP_POS_FRAMES, start_frame + i)
             ret, frame = cap.read()
             if not ret:
                 break

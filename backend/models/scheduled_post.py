@@ -77,6 +77,8 @@ class ScheduledPost:
             "title": self.title,
             "description": self.description,
             "hashtags": self.hashtags,
+            "instagram_settings": self.instagram_settings,
+            "youtube_settings": self.youtube_settings,
             "status": self.status.value,
             "retry_count": self.retry_count,
             "max_retries": self.max_retries,
@@ -115,13 +117,10 @@ class ScheduledPost:
     def is_due(self) -> bool:
         """Check if post is due to be published"""
         return (
-            self.status == ScheduleStatus.PENDING and 
+            self.status in {ScheduleStatus.PENDING, ScheduleStatus.RETRYING} and
             datetime.now() >= self.scheduled_time
         )
     
     def can_retry(self) -> bool:
         """Check if post can be retried"""
-        return (
-            self.status == ScheduleStatus.FAILED and
-            self.retry_count < self.max_retries
-        )
+        return self.retry_count < self.max_retries

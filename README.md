@@ -121,6 +121,24 @@ Copy `.env.example` to `.env` and configure the following:
 | `INSTAGRAM_ACCESS_TOKEN` | Instagram posting | [Meta for Developers](https://developers.facebook.com/) |
 | `YOUTUBE_CLIENT_ID` | YouTube posting | [Google Cloud Console](https://console.cloud.google.com/) |
 
+### Security & Runtime Controls
+
+```env
+# API security (recommended in production)
+API_KEY=your_strong_api_key
+
+# CORS allowlist (comma-separated)
+CORS_ALLOWED_ORIGINS=https://your-frontend.example.com
+
+# Upload limits / queue controls
+MAX_UPLOAD_SIZE_MB=1024
+JOB_WORKER_CONCURRENCY=1
+MAX_PENDING_JOBS=10
+
+# Feature flags
+ENABLE_BETA_SOCIAL_POSTING=false
+```
+
 ### Processing Settings
 
 ```env

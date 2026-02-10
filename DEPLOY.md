@@ -28,6 +28,12 @@ Add these in Railway dashboard → Variables:
 | `ELEVENLABS_API_KEY` | No | Voice dubbing |
 | `INSTAGRAM_ACCESS_TOKEN` | No | Instagram posting |
 | `YOUTUBE_CLIENT_ID` | No | YouTube posting |
+| `API_KEY` | Recommended | Protects `/api` and `/ws` endpoints |
+| `CORS_ALLOWED_ORIGINS` | Recommended | Comma-separated frontend origins |
+| `MAX_UPLOAD_SIZE_MB` | Optional | Upload hard limit in MB |
+| `JOB_WORKER_CONCURRENCY` | Optional | Concurrent processing workers |
+| `MAX_PENDING_JOBS` | Optional | Queue backpressure limit |
+| `ENABLE_BETA_SOCIAL_POSTING` | Optional | Enables beta social posting endpoints |
 
 ### Pricing
 

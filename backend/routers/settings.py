@@ -8,6 +8,7 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
 from ..config import get_settings
+from ..services.job_queue import get_job_queue
 from ..services.voice_dubber import VoiceDubber
 from ..utils.logger import get_logger
 
@@ -43,6 +44,7 @@ class SettingsUpdate(BaseModel):
 async def get_current_settings():
     """Get current application settings and service status"""
     settings = get_settings()
+    social_beta_enabled = settings.enable_beta_social_posting
     
     services = [
         ServiceStatus(
@@ -63,12 +65,25 @@ async def get_current_settings():
         ServiceStatus(
             name="Instagram",
             configured=bool(settings.instagram_access_token),
-            status="Ready" if settings.instagram_access_token else "Not configured"
+            status=(
+                "Ready" if (social_beta_enabled and settings.instagram_access_token)
+                else "Beta disabled" if not social_beta_enabled
+                else "Not configured"
+            )
         ),
         ServiceStatus(
             name="YouTube",
             configured=bool(settings.youtube_client_id),
-            status="Ready" if settings.youtube_client_id else "Not configured"
+            status=(
+                "Ready" if (social_beta_enabled and settings.youtube_client_id)
+                else "Beta disabled" if not social_beta_enabled
+                else "Not configured"
+            )
+        ),
+        ServiceStatus(
+            name="API Security",
+            configured=bool(settings.api_key),
+            status="API key protected" if settings.api_key else "API key disabled"
         )
     ]
     
@@ -100,8 +115,9 @@ async def health_check():
 @router.get("/version")
 async def get_version_info():
     """Get application version control info"""
+    settings = get_settings()
     return {
-        "version": "1.0.0",
+        "version": settings.app_version,
         "git_commit": get_git_revision(),
         "environment": "production"  # In a real app, read from env var
     }
@@ -121,8 +137,9 @@ def get_git_revision():
 
 def get_app_version():
     """Get formatted app version"""
+    settings = get_settings()
     git_hash = get_git_revision()
-    return f"1.0.0-{git_hash}"
+    return f"{settings.app_version}-{git_hash}"
 
 
 @router.get("/system-status")
@@ -139,6 +156,7 @@ async def get_system_status():
     
     # Get memory
     memory = psutil.virtual_memory()
+    queue_stats = get_job_queue().stats()
     
     return {
         "ffmpeg": {
@@ -154,5 +172,12 @@ async def get_system_status():
             "total_gb": round(memory.total / (1024**3), 1),
             "available_gb": round(memory.available / (1024**3), 1),
             "used_percent": memory.percent
+        },
+        "jobs_queue": {
+            "pending": queue_stats["pending"],
+            "active": queue_stats["active"],
+            "max_pending": queue_stats["max_pending"],
+            "workers": queue_stats["workers"],
+            "running": queue_stats["running"]
         }
     }

@@ -219,6 +219,7 @@ class ScheduleService:
             return
         
         self._running = True
+        self._task = asyncio.current_task()
         logger.info(f"Starting scheduler (interval: {check_interval}s)")
         
         while self._running:
@@ -234,7 +235,17 @@ class ScheduleService:
         self._running = False
         if self._task:
             self._task.cancel()
+            self._task = None
         logger.info("Scheduler stopped")
+
+    def start_background(self, check_interval: int = 60):
+        """Start scheduler in a managed background task."""
+        if self._task and not self._task.done():
+            logger.info("Scheduler task already active")
+            return self._task
+
+        self._task = asyncio.create_task(self.start_scheduler(check_interval=check_interval))
+        return self._task
     
     async def _process_due_posts(self):
         """Process all posts that are due"""
@@ -251,6 +262,17 @@ class ScheduleService:
     async def _execute_post(self, post: ScheduledPost):
         """Execute a single scheduled post"""
         logger.info(f"Executing scheduled post {post.id} to {[p.value for p in post.platforms]}")
+
+        if not self.settings.enable_beta_social_posting:
+            post.status = ScheduleStatus.FAILED
+            post.error_message = (
+                "Social posting is beta-disabled. "
+                "Set ENABLE_BETA_SOCIAL_POSTING=true to enable."
+            )
+            post.updated_at = datetime.now()
+            self._save_schedules()
+            logger.warning(f"Skipped scheduled post {post.id}: beta disabled")
+            return
         
         post.status = ScheduleStatus.PROCESSING
         post.updated_at = datetime.now()
@@ -281,24 +303,38 @@ class ScheduleService:
             if all_success:
                 post.status = ScheduleStatus.COMPLETED
                 post.posted_at = datetime.now()
+                post.error_message = None
                 logger.info(f"Successfully posted {post.id}")
             else:
                 # Some platforms failed
                 if post.can_retry():
-                    post.status = ScheduleStatus.RETRYING
                     post.retry_count += 1
+                    post.status = ScheduleStatus.RETRYING
+                    failed_platforms = [
+                        result.platform.value for result in results if not result.success
+                    ]
+                    post.error_message = (
+                        f"Failed on {', '.join(failed_platforms)}. "
+                        f"Retry {post.retry_count}/{post.max_retries}"
+                    )
                     # Retry in 5 minutes
                     post.scheduled_time = datetime.now() + timedelta(minutes=5)
                     logger.warning(f"Post {post.id} partially failed, retry {post.retry_count}/{post.max_retries}")
                 else:
                     post.status = ScheduleStatus.FAILED
-                    post.error_message = "Max retries exceeded"
+                    post.error_message = "Max retries exceeded for one or more platforms"
                     logger.error(f"Post {post.id} failed after {post.retry_count} retries")
         
         except Exception as e:
             logger.exception(f"Error executing post {post.id}: {e}")
-            post.status = ScheduleStatus.FAILED
-            post.error_message = str(e)
+            if post.can_retry():
+                post.retry_count += 1
+                post.status = ScheduleStatus.RETRYING
+                post.error_message = f"{e}. Retry {post.retry_count}/{post.max_retries}"
+                post.scheduled_time = datetime.now() + timedelta(minutes=5)
+            else:
+                post.status = ScheduleStatus.FAILED
+                post.error_message = str(e)
         
         post.updated_at = datetime.now()
         self._save_schedules()
@@ -312,7 +348,7 @@ class ScheduleService:
         cutoff = datetime.now() + timedelta(hours=hours)
         return [
             p for p in self._posts.values()
-            if p.status == ScheduleStatus.PENDING and p.scheduled_time <= cutoff
+            if p.status in {ScheduleStatus.PENDING, ScheduleStatus.RETRYING} and p.scheduled_time <= cutoff
         ]
     
     def get_stats(self) -> Dict[str, Any]:
